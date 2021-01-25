@@ -19,16 +19,16 @@ public class PessoaDAO {
     
     public List<PessoaModel> listarPessoaFilter(int first, int pageSize, String sortField, boolean asc) {
         List<PessoaModel> listPessoaModel = new ArrayList<>();
-        String order = "asc";
+        String order = " asc";
         
         if (sortField != null) {
             if (!asc) {
-               order = "desc";     
+               order = " desc";     
             }
         }
         
         String sql = " SELECT id, nome, idade " +
-                        " FROM ( SELECT id, nome, idade, row_number() over (order by id " + order + ") rowRank " +
+                        " FROM ( SELECT id, nome, idade, row_number() over (order by " + sortField + order + ") rowRank " +
                      " FROM hr.pessoa )" +
                      " WHERE rowRank BETWEEN ? AND ? ";
         try {

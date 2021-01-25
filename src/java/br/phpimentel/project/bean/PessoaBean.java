@@ -6,7 +6,6 @@ import br.phpimentel.project.service.dao.PessoaDAO;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import org.primefaces.model.LazyDataModel;
@@ -28,24 +27,38 @@ public class PessoaBean implements Serializable {
     
     private LazyDataModel<PessoaModel> lazyModel;
     
-    @PostConstruct
     public void init() {
-        //this.listPessoa();
-        
         this.lazyLoading();
     }
     
     
     public void lazyLoading() {
-        this.lazyModel = new LazyDataModel<PessoaModel>() {
-            private static final long serialVersionUID = 1L;
-            
+        this.lazyModel = new LazyDataModel() {
+
             @Override
-            public List<PessoaModel> load(int first, int pageSize, String sortField, SortOrder sortOder, Map<String, Object> filters) {
-                setRowCount(pessoaService.getRowCount());
-                return pessoaService.listarPessoaFilter(first + 1, first + pageSize, sortField, SortOrder.ASCENDING.equals(sortOder));
+            public List load(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters) {
+                int totalRowCount = pessoaService.getRowCount();
+
+                if (getRowCount() <= 0) {
+                    lazyModel.setRowCount(totalRowCount);
+                }
+                lazyModel.setPageSize(pageSize);
+                return pessoaService.listarPessoaFilter(first + 1, first + pageSize, sortField, SortOrder.ASCENDING.equals(sortOrder));
             }
+
         };
+
+//        this.lazyModel = new LazyDataModel<PessoaModel>() {
+//            private static final long serialVersionUID = 1L;
+//
+//            @Override
+//            public List<PessoaModel> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+//                setRowCount(pessoaService.getRowCount());
+//                return pessoaService.listarPessoaFilter(first + 1, first + pageSize, sortField, SortOrder.ASCENDING.equals(sortOrder));
+//            }
+//            
+//            
+//        };
     }
     
     public List<PessoaModel> listPessoa() {
@@ -85,9 +98,4 @@ public class PessoaBean implements Serializable {
     public LazyDataModel<PessoaModel> getLazyModel() {
         return lazyModel;
     }
-
-    public void setLazyModel(LazyDataModel<PessoaModel> lazyModel) {
-        this.lazyModel = lazyModel;
-    }
-   
 }
